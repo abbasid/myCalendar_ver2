@@ -1,0 +1,7 @@
+Makefile
+Makefile.Debug
+Makefile.Release
+debug/moc_mycalendar.cpp
+debug/moc_reminderdialog.cpp
+debug/moc_singleeventdialog.cpp
+userEvent.txt
