@@ -197,8 +197,6 @@ void MyCalendar::on_nextWeek_clicked()
 
 void MyCalendar::on_scheduleTable_cellClicked(int row, int column)
 {
-   myRow.append(row);
-   myColumn.append(column);
    singleEventDialog myEvent(row, column, date);
    myEvent.setModal(true);
    connect(&myEvent, SIGNAL(sendDuration(int)), this, SLOT(receiveDuration(int)));
@@ -235,6 +233,12 @@ void MyCalendar::receiveLocationandNote(QString location, QString note)
 {
     myLocation.append(location);
     myNote.append(note);
+}
+
+void MyCalendar::receiveRowAndColumn(int row, int column)
+{
+    myRow.append(row);
+    myColumn.append(column);
 }
 
 void MyCalendar::receiveRemovedIndex(int index)

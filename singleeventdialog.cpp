@@ -145,6 +145,7 @@ void singleEventDialog::on_saveButton_clicked()
     emit sendEventTime(Event->getEventTime());
     emit sendReminder(Event->getReminder());
     emit sendLocationandNote(Event->getLocation(), Event->getNote());
+    emit sendRowAndColumn(schedule_row, schedule_column);
     QTextStream out(file);
     out << "\r\n" << this->toString();
     this->close();
@@ -153,4 +154,9 @@ void singleEventDialog::on_saveButton_clicked()
 void singleEventDialog::on_note_textChanged()
 {
     ui->saveButton->setEnabled(true);
+}
+
+void singleEventDialog::on_quitButton_clicked()
+{
+    this->close();
 }

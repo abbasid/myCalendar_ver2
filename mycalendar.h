@@ -44,6 +44,7 @@ private slots:
     void receiveEventTime(QDateTime time);
     void receiveReminder(int reminder);
     void receiveLocationandNote(QString location, QString note);
+    void receiveRowAndColumn(int row, int column);
     void receiveRemovedIndex(int index);
     void receiveReminderMeLater(int index);
     void checkScheduleTime();

@@ -31,11 +31,14 @@ signals:
     void sendEventTime(QDateTime eventTime);
     void sendReminder(int reminder);
     void sendLocationandNote(QString,QString);
+    void sendRowAndColumn(int, int);
 
 private slots:
     void on_saveButton_clicked();
 
     void on_note_textChanged();
+
+    void on_quitButton_clicked();
 
 private:
     Ui::singleEventDialog *ui;

@@ -26,3 +26,6 @@ HEADERS  += mycalendar.h \
 FORMS    += mycalendar.ui \
     singleeventdialog.ui \
     reminderdialog.ui
+RC_ICONS = favicon.ico
+RESOURCES += \
+    myicon.qrc
