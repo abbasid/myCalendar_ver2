@@ -9,6 +9,8 @@
 #include <QVector>
 #include <QFile>
 #include <QTextStream>
+#include <QTextCodec>
+#include <QByteArray>
 #include "singleeventdialog.h"
 #include "reminderdialog.h"
 #include "eventinfo.h"
@@ -29,6 +31,7 @@ public:
     int getDuration() const;
     void setDuration(int value);
     void readHistory();
+    void flushHistory();
     ~MyCalendar();
 
 
@@ -42,8 +45,11 @@ private slots:
     void receiveReminder(int reminder);
     void receiveLocationandNote(QString location, QString note);
     void receiveRemovedIndex(int index);
+    void receiveReminderMeLater(int index);
     void checkScheduleTime();
     void updateTime();
+
+    void on_searchButton_clicked();
 
 private:
     Ui::MyCalendar *ui;
@@ -59,6 +65,7 @@ private:
     QVector<int> myColumn;
     QTimer *clock;
     QFile *file;
+    QTextCodec *codec;
 };
 
 #endif // MYCALENDAR_H

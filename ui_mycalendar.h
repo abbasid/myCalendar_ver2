@@ -53,10 +53,10 @@ public:
         scheduleTable->verticalHeader()->setVisible(false);
         searchName = new QLineEdit(centralWidget);
         searchName->setObjectName(QStringLiteral("searchName"));
-        searchName->setGeometry(QRect(660, 20, 161, 21));
+        searchName->setGeometry(QRect(650, 10, 171, 31));
         searchButton = new QPushButton(centralWidget);
         searchButton->setObjectName(QStringLiteral("searchButton"));
-        searchButton->setGeometry(QRect(820, 19, 61, 21));
+        searchButton->setGeometry(QRect(820, 9, 61, 31));
         QFont font;
         font.setFamily(QStringLiteral("Agency FB"));
         font.setPointSize(10);
@@ -78,7 +78,11 @@ public:
         nextWeek->setFont(font1);
         currentTime = new QLineEdit(centralWidget);
         currentTime->setObjectName(QStringLiteral("currentTime"));
-        currentTime->setGeometry(QRect(60, 10, 201, 41));
+        currentTime->setGeometry(QRect(60, 10, 171, 41));
+        QFont font2;
+        font2.setFamily(QStringLiteral("Arial"));
+        font2.setPointSize(14);
+        currentTime->setFont(font2);
         MyCalendar->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MyCalendar);
         menuBar->setObjectName(QStringLiteral("menuBar"));

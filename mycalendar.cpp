@@ -1,4 +1,4 @@
-#include "mycalendar.h"
+﻿#include "mycalendar.h"
 #include "ui_mycalendar.h"
 
 MyCalendar::MyCalendar(QWidget *parent) :
@@ -6,19 +6,24 @@ MyCalendar::MyCalendar(QWidget *parent) :
     ui(new Ui::MyCalendar)
 {
     ui->setupUi(this);
+    codec = QTextCodec::codecForName("Big5");
     clock = new QTimer;
     clock->setInterval(10000);
     file  = new QFile("userEvent.txt");
-    ui->scheduleTable->setRowCount(24);
+    ui->scheduleTable->setRowCount(25);
     ui->scheduleTable->setColumnCount(8);
+    ui->searchName->setText(codec->toUnicode("請輸入標題"));
     date = date.currentDateTime();
     updateDate();
     addTimeInterval();
     readHistory();
     updateCalendar();
+    updateTime();
     connect(clock, SIGNAL(timeout()),this, SLOT(updateTime()));
     connect(clock, SIGNAL(timeout()), this, SLOT(checkScheduleTime()));
     clock->start();
+    ui->currentTime->setText(currentTime.toString("yyyy/MM/dd hh:mm"));
+
 }
 
 void MyCalendar::updateDate()
@@ -54,17 +59,16 @@ void MyCalendar::updateCalendar()
 
     for(int i = 0; i < myDuration.size(); i ++)
     {
-
         if(myDuration.at(i) == 0)
         {
-            ui->scheduleTable->setItem(myRow.at(i), myColumn.at(i), new QTableWidgetItem(mySubject.at(i)));
+            ui->scheduleTable->setItem(myRow.at(i), myColumn.at(i), new QTableWidgetItem( mySubject.at(i) + " " + myTime.at(i).toString("hh:mm")));
             ui->scheduleTable->item(myRow.at(i), myColumn.at(i))->setBackground(Qt::red);
         }
         else if(myDuration.at(i) == 1)
         {
             for(int j = 0; j < 2; j++)
             {
-                ui->scheduleTable->setItem(myRow.at(i) + j, myColumn.at(i), new QTableWidgetItem(mySubject.at(i)));
+                ui->scheduleTable->setItem(myRow.at(i) + j, myColumn.at(i), new QTableWidgetItem(mySubject.at(i) + " " + myTime.at(i).toString("hh:mm")));
                 ui->scheduleTable->item(myRow.at(i) + j, myColumn.at(i))->setBackground(Qt::red);
             }
         }
@@ -72,7 +76,7 @@ void MyCalendar::updateCalendar()
         {
             for(int j = 0; j < 3; j++)
             {
-                ui->scheduleTable->setItem(myRow.at(i) + j, myColumn.at(i), new QTableWidgetItem(mySubject.at(i)));
+                ui->scheduleTable->setItem(myRow.at(i) + j, myColumn.at(i), new QTableWidgetItem(mySubject.at(i) + " " + myTime.at(i).toString("hh:mm")));
                 ui->scheduleTable->item(myRow.at(i) + j, myColumn.at(i))->setBackground(Qt::red);
             }
         }
@@ -130,10 +134,22 @@ void MyCalendar::readHistory()
         myRow.append(rowTmp);
         myColumn.append(columnTmp);
     }
+    file->close();
+}
+
+void MyCalendar::flushHistory()
+{
+    file->open(QIODevice::WriteOnly | QIODevice::Truncate);
+    QTextStream out(file);
+    for(int i = 0; i < mySubject.size(); i++)
+    {
+        out << mySubject.at(i) << "\t" << myLocation.at(i) << "\t" << myNote.at(i) << "\t" << myTime.at(i).toString("yyyyMMddhhmm") << "\t" << QString::number(myDuration.at(i)) << "\t" << QString::number(myReminder.at(i)) << "\t" << QString::number(myRow.at(i)) << "\t" << QString::number(myColumn.at(i));
+    }
 }
 
 MyCalendar::~MyCalendar()
 {
+    flushHistory();
     delete clock;
     delete ui;
 }
@@ -152,9 +168,10 @@ void MyCalendar::checkScheduleTime()
             myTimeTmp.addSecs(-600);
         if(currentTime.toString("yyyyMMddhhmm") == myTimeTmp.toString("yyyyMMddhhmm"))
         {
-              reminderDialog reminderdialog(mySubject.at(i), myLocation.at(i), myTime.at(i), myNote.at(i), i);
+              reminderDialog reminderdialog(mySubject.at(i), myLocation.at(i), myTime.at(i), myNote.at(i), i, false);
               reminderdialog.setModal(true);
               connect(&reminderdialog, SIGNAL(sendRemovedIndex(int)), this, SLOT(receiveRemovedIndex(int)));
+              connect(&reminderdialog, SIGNAL(sendRemindMeLater(int)), this, SLOT(receiveReminderMeLater(int)));
               reminderdialog.exec();
         }
     }
@@ -236,4 +253,46 @@ void MyCalendar::receiveRemovedIndex(int index)
     updateDate();
     addTimeInterval();
     updateCalendar();
+}
+
+void MyCalendar::receiveReminderMeLater(int index)
+{
+    myTime.at(index).addSecs(180000);
+}
+
+void MyCalendar::on_searchButton_clicked()
+{
+    QString strTmp;
+    strTmp = ui->searchName->text();
+    QByteArray searchNameByteArray = strTmp.toLocal8Bit();
+    QByteArray mySubjectByteArray;
+    char* searchNameChar = searchNameByteArray.data();
+    bool search = false;
+    while(search == false && strTmp != NULL)
+    {
+        for(int i = 0; i < mySubject.size(); i++ )
+        {
+            mySubjectByteArray = mySubject.at(i).toLocal8Bit();
+            char* mySubjectChar = mySubjectByteArray.data();
+            for(int j = 0; j < mySubjectByteArray.size(); j++)
+            {
+                if(search)
+                    break;
+                for(int k = 0; k < searchNameByteArray.size(); k++)
+                {
+                    if(search)
+                        break;
+                    if(searchNameByteArray[k] == mySubjectChar[j])
+                    {
+                        reminderDialog reminderdialog(mySubject.at(i), myLocation.at(i), myTime.at(i), myNote.at(i), i, true);
+                        reminderdialog.setModal(true);
+                        reminderdialog.exec();
+                        search = true;
+                    }
+                }
+            }
+        }
+    }
+
+
 }
